@@ -1,0 +1,89 @@
+.CharacterList{
+    margin-top: 53px;
+    max-width: 1100px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    position: relative;
+    .CharacterList__description{
+        position: sticky;
+        top:0;
+        margin-top:45px;
+        margin-left: 25px;
+        width: 40%;
+        
+    }
+    .CharacterList__form{
+        width: 60%;
+        .CharacterList__list{
+            padding-left: 0;
+            list-style-type: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            
+        }
+        .loadmore{
+            display: flex;
+            justify-content: center;
+            .load{
+                text-transform: uppercase;
+                font-style: normal;
+                font-weight: normal;
+                font-size: 14px;
+                line-height: 16px;
+                background-color: #9F0013;
+                color:#FFFFFF;
+                border: 0;
+                padding: 10px 45px;
+                cursor: pointer;
+                transition: all 0.3s;
+                
+            }
+            .load:hover{
+                filter: drop-shadow(0px 5px 20px #9F0013);
+                transform: translate(0px, -3px);
+            }
+            .load:disabled{
+                filter:grayscale(.5)
+            }
+        }
+        
+    }
+    .background{
+        position: absolute;
+        background-image: url('../../img/bg_vision.png');
+        width: 467px;
+        height: 372px;
+        z-index:-1;
+        top:65%;
+        left:70%
+    }
+    
+}
+.selectItem{
+    filter: drop-shadow(0px 5px 20px #9F0013);
+}
+@media (max-width:1060px){
+    .CharacterList .CharacterList__form .CharacterList__list{
+        justify-content: center;
+        gap:10px;
+    }
+}
+@media (max-width:740px){
+    .CharacterList .background{
+        display: none;
+    }
+    .CharacterList .CharacterList__form .CharacterList__list{
+        justify-content: start;
+        
+    }
+    .CharacterList .CharacterList__form{
+        width: 40%;
+    }
+    .CharacterList{
+        justify-content: center;
+    }
+}
+

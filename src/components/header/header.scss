@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Merienda&family=Roboto+Condensed:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+.Header{
+    margin-top: 50px;
+    ul{ padding: 0;
+        display: flex;
+        justify-content: space-between;
+        list-style-type: none;
+        font-family: 'Roboto Condensed', sans-serif;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 28px;
+        line-height: 33px;
+        
+    }
+    li{
+        
+        span{
+            color:#9F0013
+        }
+        
+    }
+    a{  
+        text-decoration: none;
+        color:black;
+    }
+    .select{
+        color:#9F0013;
+    }
+    .no__select{
+        color:black;
+    }
+}
+@media(max-width:600px){
+   .Header ul{
+    font-size: 24px;
+   } 
+}
