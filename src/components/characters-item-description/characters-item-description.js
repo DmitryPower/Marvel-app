@@ -1,68 +1,50 @@
-import { Component } from 'react';
+import {useEffect, useState } from 'react';
 import './characters-item-description.scss'
-import MarvelService from '../../servises/MarvelService'
+import useMarvelService from '../../servises/MarvelService'
 import ErrorMessage from '../error-message/error-message'
 import spinner from '../../img/spinner.gif'
 import Skeleton from '../skeleton/skeleton';
-import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 
-class CharactersItemDesription extends Component {
 
-    state = {
-        loading: false,
-        error: false,
-        character: null,
+const CharactersItemDesription = (props)=> {
 
-    }
-    marvelService = new MarvelService();
-    componentDidMount() {
-        this.updateCharacter();
-    }
-    componentDidUpdate(prevProps) {
-        if (prevProps.selectedId !== this.props.selectedId) {
-            this.updateCharacter();
-        }
-    }
+
+const [character, setCharacter] = useState(null)
+const { selectedId } = props
     
-    onError = () => {
-        this.setState({
-            error: true
-        })
+const {loading, error, getCharacter, clearError} =  useMarvelService();
+
+useEffect(()=>{
+    updateCharacter()
+},[selectedId])
+
+   
+   
+    const onChar = (character) => {
+        setCharacter(character)
+        
     }
-    onChar = (character) => {
-        this.setState({
-            character,
-            loading: false,
-            error: false
-        })
-    }
-    updateCharacter = () => {
-        const { selectedId } = this.props
+    const updateCharacter = () => {
+        
         if (!selectedId) {
             return;
         }
-        this.onCharLoading()
-        this.marvelService
-            .getCharacter(selectedId)
-            .then(this.onChar)
-            .catch(this.onError)
-        
-    }
-    onCharLoading = () => {
-        this.setState({
-            loading: true
-        })
-    }
+        clearError();
+        getCharacter(selectedId)
+            .then(onChar)
+        }
+    
 
 
-    render() {
+    
         
-        const {loading, error, character } = this.state
+        
         
         const errorMessage = error ? <ErrorMessage /> : null
         const spinner_cont = loading ? <div className='spinner__wrapper'><img src={spinner} alt='spinner' /></div> : null
-        const content = !(loading || error || !character) ? <View character={character} /> : null
+        const content = !(loading || error || !character) ? <View character={character} key = {selectedId}/> : null
         const skeleton = character || loading || error? null : <Skeleton />
 
         return (
@@ -76,7 +58,7 @@ class CharactersItemDesription extends Component {
 
     }
 
-}
+
 
 const View = ({ character }) => {
     
@@ -89,9 +71,10 @@ const View = ({ character }) => {
             return;
         }
         else {
+            
             return (
-                <li className='comics__item'
-                    key={index + 1}>{item.name}</li>
+                <Link to={`/comics/${item.resourceURI.split('/').splice(6,1)}`} className='comics__item'
+                    key={index + 1}>{item.name}</Link>
             )
         }
     })
@@ -120,7 +103,5 @@ const View = ({ character }) => {
         </div>
     )
 }
-CharactersItemDesription.propTypes = {
-    selectedId: PropTypes.number.isRequired
-}
+
 export default CharactersItemDesription;

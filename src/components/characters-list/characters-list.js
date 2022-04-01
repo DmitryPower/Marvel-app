@@ -1,70 +1,54 @@
 
 import './characters-list.scss'
-import { Component } from 'react'
+import {useEffect, useState } from 'react'
 import CharacterItem from '../character-item/character-item'
 import CharactersItemDesription from '../characters-item-description/characters-item-description'
 import SearchPanel from '../search-panel/search-panel'
-import MarvelService from '../../servises/MarvelService'
+import useMarvelService from '../../servises/MarvelService'
 import ErrorMessage from '../error-message/error-message'
 import spinner from '../../img/spinner.gif'
 import ErrorBoundary from '../error-boundary/errorBoundary'
 
-class CharactersList extends Component {
+const CharactersList = () => {
 
-    state = {
-        characters: [],
-        loading: true,
-        error: false,
-        newItemLoading: false,
-        offset: 210,
-        selectedId: null,
-        charEnded: false,
+    const [characters, setCharacters] = useState([])
+    
+    const [newItemLoading, setNewItemLoading] = useState(false)
+    const [offset, setOffset] = useState(210)
+    const [selectedId, setSelectedId] = useState(null)
+    const [charEnded, setCharEnded] = useState(false)
 
-    }
 
-    marvelService = new MarvelService();
-    componentDidMount() {
-        this.onRequest()
+    const {loading, error, getAllCharacters} = useMarvelService();
+
+    useEffect(() => { onRequest(offset, true) }, []);
+
+
+    const onRequest = (offset,initial) => {
+        initial ? setNewItemLoading(false) : setNewItemLoading(true);
         
+        getAllCharacters(offset)
+            .then(onCharactersLoaded)
+            
     }
-      
-    onRequest = (offset) => {
-        this.onCharListLoading();
-        this.marvelService.getAllCharacters(offset)
-            .then(this.onCharactersLoaded)
-            .catch(this.onError)
-    }
-    onCharListLoading = () => {
-        this.setState({
-            newItemLoading: true
-        })
-    }
-    onCharactersLoaded = (newCharacters) => {
+    
+    const onCharactersLoaded = (newCharacters) => {
         let ended = false;
-        if (newCharacters<9){
+        if (newCharacters < 9) {
             ended = true;
         }
-
-        this.setState(({ characters, offset }) => ({
-            characters: [...characters, ...newCharacters],
-            loading: false,
-            newItemLoading: false,
-            offset: offset + 9,
-            charEnded: ended,
-            
-        }))
+        setCharacters(characters => [...characters, ...newCharacters])
+        setOffset(offset => offset + 9)
+        setNewItemLoading(false)
+        setCharEnded(ended)
     }
 
-    onError = () => {
-        this.setState({
-            error: true
-        })
-    }
-    SavaOffset = ()=>{
+    
+    /*SavaOffset = () => {
         const offset = this.state.offset
         localStorage.setItem('offset', String(offset))
     }
-    GetOffset = ()=>{
+    GetOffset = () => {
         return Number(localStorage.getItem('offset'))
     }
     /*loadCharacteres = () => {
@@ -76,73 +60,62 @@ class CharactersList extends Component {
     }*/
 
 
-    clickCharacter = (id) => {
-
-        this.setState(({ characters }) => ({
-            characters: characters.map(item => {
-                if (item.selected === true && item.id !==id) {
-                    return { ...item, selected: !item.selected }
-                }
-                if (item.id === id && item.selected === false) {
-                    return { ...item, selected: !item.selected }
-                }
-                else {
-                    return item
-                }
-            })
-        ,
-        selectedId: id}))
-        
-
+    const clickCharacter = (id) => {
+        setCharacters(characters => characters.map(item => {
+            if (item.selected === true && item.id !== id) {
+                return { ...item, selected: !item.selected }
+            }
+            if (item.id === id && item.selected === false) {
+                return { ...item, selected: !item.selected }
+            }
+            else {
+                return item
+            }
+        }))
+        setSelectedId(id)
     }
 
-    
-
-    render() {
-        const { characters, loading, error, selectedId, newItemLoading,charEnded, offset } = this.state
-        
-
-        const elements = characters.map((item) => {
-            const { id, ...ItemProps } = item
-            return (
-                <CharacterItem
-                    key={id} {...ItemProps}
-                    clickCharacter={() => this.clickCharacter(id)}
-
-                />
-            )
-        })
-        const errorMessage = error ? <ErrorMessage /> : null
-        const spinner_cont = loading ? <div className='spinner__wrapper'><img src={spinner} alt='spinner' /></div> : null
-        const content = !(loading || error) ? elements : null
-
+    const elements = characters.map((item) => {
+        const { id, ...ItemProps } = item
         return (
-            <section className='CharacterList'>
-                <div className='CharacterList__form'>
-                    {errorMessage}
-                    {spinner_cont}
+            <CharacterItem
+                key={id} {...ItemProps}
+                clickCharacter={() => clickCharacter(id)}
 
-                    <ul className='CharacterList__list'>
-
-                        {content}
-                    </ul>
-                    <div className='loadmore'>
-                    <button className='load' 
-                    disabled={newItemLoading} 
-                    onClick={()=>this.onRequest(offset)}
-                    style = {{'display': charEnded ? 'none':'block'}}>Load more</button>
-                    </div>
-                </div>
-                <div className='CharacterList__description'>
-                    <ErrorBoundary>
-                        <CharactersItemDesription
-                            selectedId={selectedId} />
-                    </ErrorBoundary>
-                    
-                </div>
-                <div className='background' />
-            </section>
+            />
         )
-    }
+    })
+    const errorMessage = error ? <ErrorMessage /> : null
+    const spinner_cont = (loading &&!newItemLoading) ? <div className='spinner__wrapper'><img src={spinner} alt='spinner' /></div> : null
+    
+    
+    return (
+        <section className='CharacterList'>
+            <div className='CharacterList__form'>
+                {errorMessage}
+                {spinner_cont}
+
+                <ul className='CharacterList__list'>
+
+                    {elements}
+                </ul>
+                <div className='loadmore'>
+                    <button className='load'
+                        disabled={newItemLoading}
+                        onClick={() => onRequest(offset)}
+                        style={{ 'display': charEnded ? 'none' : 'block' }}>Load more</button>
+                </div>
+            </div>
+            <div className='CharacterList__description'>
+                <ErrorBoundary>
+                    <CharactersItemDesription
+                        selectedId={selectedId} />
+                </ErrorBoundary>
+
+            </div>
+            <div className='background' />
+        </section>
+    )
 }
+
 export default CharactersList

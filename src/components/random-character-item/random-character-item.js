@@ -2,9 +2,9 @@
 
 import './random-character-item.scss'
 
-function RandomCharacterItem(props) {
+function RandomCharacterItem({char}) {
 
-    const { name, description, thumbnail, homepage, wiki, } = props.char
+    const { name, description, thumbnail, homepage, wiki, } = char
     let message = description
 
     if (message === '') {
@@ -15,7 +15,7 @@ function RandomCharacterItem(props) {
         <div className='RandomCharacterItem'>
             <div className='img_character'>
                 <img src={thumbnail} alt={name}
-                    style={{ 'objectFit': thumbnail.indexOf('not_available') === -1 ? 'cover' : 'fill' }} />
+                    style={{ 'objectFit': thumbnail ==='http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available' ? 'cover' : 'fill' }} />
             </div>
 
             <div className='form__character'>
